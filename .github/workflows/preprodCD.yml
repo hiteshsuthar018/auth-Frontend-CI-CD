@@ -1,0 +1,31 @@
+name: "CD pipelint for auth frontend"
+on:
+    workflow_dispatch:
+jobs:
+    cd:
+        runs-on: ubuntu-latest
+        environment: preprod
+        steps:
+            - name: "setup node js"
+              uses: actions/setup-node@v6
+              with:
+                node-version: "21"
+            - name: "checking node version"
+              run: |
+                  node --version
+                  npm --version
+            
+            - name: "download file from artifact"
+              uses: actions/download-artifact@v7
+              with:
+                name: build
+                run-id: ${{github.run_id}}
+                github-token: ${{github.token}}
+            
+            - name: "setup vercel cli"
+              run: npm install -g vercel
+            
+            - name: "deployee on vercel"
+              run: vercel --prod --token=${{secrets.VERCEL_TOKEN}} --confirm --name=frontendauth
+             
+

@@ -1,0 +1,48 @@
+name: "CI Pipeline for Auth Frontend Preprod"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    environment: preprod
+    steps:
+      - name: "Setup nodejs"
+        uses: actions/setup-node@v6
+        with:
+         node-version: '21'
+      
+      - name: "checking node version"
+        run: |
+           node --version
+           npm --version
+      
+      - name: "checkout the project"
+        uses: actions/checkout@v2
+
+      - name: "list the project file"
+        run: |
+          echo ${{vars.VITE_APP_KEY}}
+          ls
+
+      - name: "install node modules"
+        run: npm install
+      
+      - name: "Run lint"
+        run: npm run lint
+
+      - name: "build the project"
+        run: |
+          echo VITE_APP_KEY=$VITE_APP_KEY >> .env
+          echo VITE_JS_KEY=$VITE_JS_KEY >> .env
+          npm run build
+        env:
+          VITE_APP_KEY: ${{vars.VITE_APP_KEY}}
+          VITE_JS_KEY: ${{vars.VITE_JS_KEY}}
+
+      - name: "upload the project"
+        uses: actions/upload-artifact@v6
+        with:
+          name: build
+          path: dist
