@@ -1,5 +1,9 @@
-name: "CD pipelint for auth frontend"
+name: "CD pipeline for auth frontend"
 on:
+    workflow_run:
+        workflows: ['CI Pipeline for Auth Frontend Preprod']
+        types:
+            - completed
     workflow_dispatch:
 jobs:
     cd:
@@ -19,7 +23,7 @@ jobs:
               uses: actions/download-artifact@v7
               with:
                 name: build
-                run-id: ${{github.run_id}}
+                run-id: ${{github.event.workflow_run.id}}
                 github-token: ${{github.token}}
             
             - name: "setup vercel cli"
